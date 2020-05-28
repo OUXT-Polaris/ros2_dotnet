@@ -47,8 +47,14 @@ void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractSequence) and isinstance(member.type.value_type, BasicType)]@
+
+@(msg_prefix)_EXPORT
+bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.type.value_type)) *value, int size, void *message_handle);
+
+@(msg_prefix)_EXPORT
+@(msg_type_to_c(member.type.value_type)) *@(msg_typename)_native_read_field_@(member.name)(void *message_handle);
+
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
