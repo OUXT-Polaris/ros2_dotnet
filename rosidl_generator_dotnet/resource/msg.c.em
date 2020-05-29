@@ -21,6 +21,7 @@ header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namesp
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <@('/'.join(message.structure.namespaced_type.namespaces))/@(convert_camel_case_to_lower_case_underscore(type_name)).h>
 #include "rosidl_generator_c/message_type_support_struct.h"
@@ -62,7 +63,7 @@ bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.ty
   return true;
 }
 
-@(msg_type_to_c(member.type.value_type)) *@(msg_typename)_native_read_field_@(member.name)(void *message_handle)
+@(msg_type_to_c(member.type.value_type)) * @(msg_typename)_native_read_field_@(member.name)_value(void *message_handle)
 {
   @(msg_typename) *ros_message = (@(msg_typename) *)message_handle;
 @[    if isinstance(member.type, Array)]@
@@ -72,6 +73,11 @@ bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.ty
 @[    end if]@
 }
 
+size_t @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle)
+{
+  @(msg_typename) *ros_message = (@(msg_typename) *)message_handle;
+  return sizeof(ros_message->@(member.name).data);
+}
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@

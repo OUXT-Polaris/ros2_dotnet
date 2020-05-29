@@ -18,6 +18,7 @@ msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespace
 }
 using System;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 using ROS2.Interfaces;
 using ROS2.Utils;
@@ -36,7 +37,7 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+        @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType)]@
@@ -206,7 +207,7 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+    public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name)) { get; set; }
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    else]@
