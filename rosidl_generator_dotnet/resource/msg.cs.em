@@ -74,6 +74,8 @@ public class @(type_name) : IMessage {
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported
+        IntPtr @(msg_typename)_native_read_field_@(member.name)_value_ptr = 
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_value");
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -117,8 +119,11 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractSequence) and isinstance(member.type.value_type, BasicType)]@
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    unsafe private delegate @(get_dotnet_type(member.type.value_type)) * NativeReadField@(get_field_name(type_name, member.name))ValueType(IntPtr messageHandle);
+
+    private static NativeReadField@(get_field_name(type_name, member.name))ValueType native_read_field_@(member.name)_value = null;
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
