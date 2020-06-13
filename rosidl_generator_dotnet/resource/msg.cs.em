@@ -78,7 +78,7 @@ public class @(type_name) : IMessage {
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_value");
 
         IntPtr native_write_field_@(member.name)_ptr =
-            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_write_field_@(member.name)_value");
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_write_field_@(member.name)");
         @(type_name).native_write_field_@(member.name) =
             (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));
