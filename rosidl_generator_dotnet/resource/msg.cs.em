@@ -73,8 +73,18 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
+@[if isinstance(member.type.value_type, BasicType)]@
         IntPtr @(msg_typename)_native_read_field_@(member.name)_value_ptr = 
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_value");
+
+        IntPtr native_write_field_@(member.name)_ptr =
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_write_field_@(member.name)_value");
+        @(type_name).native_write_field_@(member.name) =
+            (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));
+@[else]@
+// TODO: Sequence types of message are not supported
+@[end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -118,7 +128,8 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
-@[    elif isinstance(member.type, AbstractSequence) and isinstance(member.type.value_type, BasicType)]@
+@[    elif isinstance(member.type, AbstractSequence)]@
+@[        if isinstance(member.type.value_type, BasicType)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     unsafe private delegate @(get_dotnet_type(member.type.value_type)) * NativeReadField@(get_field_name(type_name, member.name))ValueType(IntPtr messageHandle);
 
@@ -127,6 +138,14 @@ public class @(type_name) : IMessage {
     private delegate int NativeReadField@(get_field_name(type_name, member.name))SizeType(IntPtr messageHandle);
 
     private static NativeReadField@(get_field_name(type_name, member.name))SizeType native_read_field_@(member.name)_size = null;
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    unsafe private delegate bool NativeWriteField@(get_field_name(type_name, member.name))Type(@(get_dotnet_type(member.type.value_type)) * value, int size ,IntPtr messageHandle);
+
+    private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
+@[        else]@
+// TODO: Sequence types of message are not supported
+@[        end if]
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -181,6 +200,8 @@ public class @(type_name) : IMessage {
                 @(get_field_name(type_name, member.name)).Add(v);
             }
         }
+@[        else]
+        // TODO: Sequence types of message are not supported
 @[        end if]
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -202,7 +223,19 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        unsafe
+        {
+            @(get_dotnet_type(member.type.value_type))[] values = @(get_field_name(type_name, member.name)).ToArray();
+            fixed( @(get_dotnet_type(member.type.value_type)) * values_ptr = &values[0] )
+            {
+                int seq_size = @(get_field_name(type_name, member.name)).Count;
+                native_write_field_@(member.name)(values_ptr,seq_size,messageHandle);
+            }
+        }
+@[else]
+// TODO: Sequence types of message are not supported
+@[end if]
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
