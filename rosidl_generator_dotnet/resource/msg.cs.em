@@ -73,7 +73,6 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
         IntPtr @(msg_typename)_native_read_field_@(member.name)_value_ptr = 
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_value");
 @[    elif isinstance(member.type, AbstractWString)]@
@@ -124,6 +123,10 @@ public class @(type_name) : IMessage {
     unsafe private delegate @(get_dotnet_type(member.type.value_type)) * NativeReadField@(get_field_name(type_name, member.name))ValueType(IntPtr messageHandle);
 
     private static NativeReadField@(get_field_name(type_name, member.name))ValueType native_read_field_@(member.name)_value = null;
+
+    private delegate int NativeReadField@(get_field_name(type_name, member.name))SizeType(IntPtr messageHandle);
+
+    private static NativeReadField@(get_field_name(type_name, member.name))SizeType native_read_field_@(member.name)_size = null;
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -167,7 +170,18 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        unsafe
+        {
+            @(get_dotnet_type(member.type.value_type)) * @(get_field_name(type_name, member.name))_value = native_read_field_@(member.name)_value(messageHandle);
+            int @(get_field_name(type_name, member.name))_size =  native_read_field_@(member.name)_size(messageHandle);
+            @(get_field_name(type_name, member.name)).Clear();
+            for(int i=0; i<@(get_field_name(type_name, member.name))_size; i++){
+                @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[i];
+                @(get_field_name(type_name, member.name)).Add(v);
+            }
+        }
+@[        end if]
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
