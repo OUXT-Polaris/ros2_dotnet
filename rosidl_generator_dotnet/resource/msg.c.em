@@ -76,8 +76,9 @@ bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.ty
 size_t @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle)
 {
   @(msg_typename) *ros_message = (@(msg_typename) *)message_handle;
-  return sizeof(ros_message->@(member.name).data);
+  return ros_message->@(member.name).size;
 }
+
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@

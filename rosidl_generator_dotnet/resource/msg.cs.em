@@ -73,16 +73,24 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 // TODO: Array types are not supported
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[if isinstance(member.type.value_type, BasicType)]@
-        IntPtr @(msg_typename)_native_read_field_@(member.name)_value_ptr = 
+@[        if isinstance(member.type.value_type, BasicType)]@
+        IntPtr native_read_field_@(member.name)_value_ptr = 
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_value");
+        IntPtr native_read_field_@(member.name)_size_ptr = 
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_read_field_@(member.name)_size");
+        @(type_name).native_read_field_@(member.name)_value =
+            (NativeReadField@(get_field_name(type_name, member.name))ValueType)Marshal.GetDelegateForFunctionPointer(
+            native_read_field_@(member.name)_value_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))ValueType));
+        @(type_name).native_read_field_@(member.name)_size =
+            (NativeReadField@(get_field_name(type_name, member.name))SizeType)Marshal.GetDelegateForFunctionPointer(
+            native_read_field_@(member.name)_value_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))SizeType));
 
         IntPtr native_write_field_@(member.name)_ptr =
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_write_field_@(member.name)");
         @(type_name).native_write_field_@(member.name) =
             (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));
-@[else]@
+@[        else]@
 // TODO: Sequence types of message are not supported
 @[end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
@@ -192,12 +200,20 @@ public class @(type_name) : IMessage {
 @[        if isinstance(member.type.value_type, BasicType)]@
         unsafe
         {
-            @(get_dotnet_type(member.type.value_type)) * @(get_field_name(type_name, member.name))_value = native_read_field_@(member.name)_value(messageHandle);
-            int @(get_field_name(type_name, member.name))_size =  native_read_field_@(member.name)_size(messageHandle);
+            int @(get_field_name(type_name, member.name))_size = native_read_field_@(member.name)_size(messageHandle);
             @(get_field_name(type_name, member.name)).Clear();
-            for(int i=0; i<@(get_field_name(type_name, member.name))_size; i++){
-                @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[i];
-                @(get_field_name(type_name, member.name)).Add(v);
+            if(@(get_field_name(type_name, member.name))_size > 0)
+            {
+                @(get_dotnet_type(member.type.value_type))[] values = new @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
+                //@(get_dotnet_type(member.type.value_type))[] values = stackalloc @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
+                fixed(@(get_dotnet_type(member.type.value_type)) * values_ptr = &values[0])
+                {
+                    @(get_dotnet_type(member.type.value_type)) * @(get_field_name(type_name, member.name))_value = native_read_field_@(member.name)_value(messageHandle);
+                    for(int i=0; i<@(get_field_name(type_name, member.name))_size; i++){
+                        @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[2];
+                        @(get_field_name(type_name, member.name)).Add(v);
+                    }
+                }
             }
         }
 @[        else]

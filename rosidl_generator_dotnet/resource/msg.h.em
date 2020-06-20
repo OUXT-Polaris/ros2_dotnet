@@ -17,6 +17,8 @@ header_guard = "{0}_H".format(msg_prefix)
 #ifndef @(header_guard)
 #define @(header_guard)
 
+#include "rosidl_generator_c/primitives_sequence.h"
+
 #if defined(_MSC_VER)
     //  Microsoft
     #define @(msg_prefix)_EXPORT __declspec(dllexport)
