@@ -206,14 +206,11 @@ public class @(type_name) : IMessage {
             {
                 @(get_dotnet_type(member.type.value_type))[] values = new @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
                 @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(values);
-                //@(get_dotnet_type(member.type.value_type))[] values = stackalloc @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
                 fixed(@(get_dotnet_type(member.type.value_type)) * values_ptr = &values[0])
                 {
                     @(get_dotnet_type(member.type.value_type)) * @(get_field_name(type_name, member.name))_value = native_read_field_@(member.name)_value(messageHandle);
                     for(int i=0; i<@(get_field_name(type_name, member.name))_size; i++){
-                        @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[0];
-                        //@(get_field_name(type_name, member.name)).Add(v);
-                        @(get_field_name(type_name, member.name))[i] = v;
+                        @(get_field_name(type_name, member.name))[i] = @(get_field_name(type_name, member.name))_value[i];
                     }
                 }
             }
