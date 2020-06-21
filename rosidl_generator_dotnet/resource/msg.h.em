@@ -58,7 +58,7 @@ bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.ty
 @(msg_type_to_c(member.type.value_type)) * @(msg_typename)_native_read_field_@(member.name)_value(void *message_handle);
 
 @(msg_prefix)_EXPORT
-size_t @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle);
+int @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle);
 
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported

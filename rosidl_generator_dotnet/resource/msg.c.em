@@ -73,7 +73,7 @@ bool @(msg_typename)_native_write_field_@(member.name)(@(msg_type_to_c(member.ty
 @[    end if]@
 }
 
-size_t @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle)
+int @(msg_typename)_native_read_field_@(member.name)_size(void *message_handle)
 {
   @(msg_typename) *ros_message = (@(msg_typename) *)message_handle;
   return ros_message->@(member.name).size;

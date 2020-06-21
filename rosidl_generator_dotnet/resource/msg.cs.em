@@ -83,7 +83,7 @@ public class @(type_name) : IMessage {
             native_read_field_@(member.name)_value_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))ValueType));
         @(type_name).native_read_field_@(member.name)_size =
             (NativeReadField@(get_field_name(type_name, member.name))SizeType)Marshal.GetDelegateForFunctionPointer(
-            native_read_field_@(member.name)_value_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))SizeType));
+            native_read_field_@(member.name)_size_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))SizeType));
 
         IntPtr native_write_field_@(member.name)_ptr =
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)_native_write_field_@(member.name)");
@@ -201,17 +201,19 @@ public class @(type_name) : IMessage {
         unsafe
         {
             int @(get_field_name(type_name, member.name))_size = native_read_field_@(member.name)_size(messageHandle);
-            @(get_field_name(type_name, member.name)).Clear();
+            //@(get_field_name(type_name, member.name)).Clear();
             if(@(get_field_name(type_name, member.name))_size > 0)
             {
                 @(get_dotnet_type(member.type.value_type))[] values = new @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
+                @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(values);
                 //@(get_dotnet_type(member.type.value_type))[] values = stackalloc @(get_dotnet_type(member.type.value_type))[@(get_field_name(type_name, member.name))_size];
                 fixed(@(get_dotnet_type(member.type.value_type)) * values_ptr = &values[0])
                 {
                     @(get_dotnet_type(member.type.value_type)) * @(get_field_name(type_name, member.name))_value = native_read_field_@(member.name)_value(messageHandle);
                     for(int i=0; i<@(get_field_name(type_name, member.name))_size; i++){
-                        @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[2];
-                        @(get_field_name(type_name, member.name)).Add(v);
+                        @(get_dotnet_type(member.type.value_type)) v = @(get_field_name(type_name, member.name))_value[0];
+                        //@(get_field_name(type_name, member.name)).Add(v);
+                        @(get_field_name(type_name, member.name))[i] = v;
                     }
                 }
             }
