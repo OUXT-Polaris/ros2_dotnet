@@ -58,7 +58,7 @@ void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, i
 
 int @(msg_typename)__getsize_array_field_@(member.name)_message()
 {
-@[        if isinstance(member.type, Array)]@
+@[        if isinstance(member.type, (AbstractSequence,Array))]@
   return @(member.type.size);
 @[        else]@
   return 0;
@@ -90,9 +90,6 @@ void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_typ
 }
 @[        end if]@
 
-////////////////////////////////////////////////////////
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@

@@ -45,7 +45,7 @@ void * @(msg_prefix)_CDECL @(msg_typename)__create_native_message();
 void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
 @(msg_prefix)_EXPORT
 void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int);
 @(msg_prefix)_EXPORT
@@ -58,8 +58,6 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 @(msg_type_to_c(member.type.value_type)) @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
 @[        end if]@
 
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
