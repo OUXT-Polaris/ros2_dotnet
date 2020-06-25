@@ -50,6 +50,10 @@ void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int);
 @(msg_prefix)_EXPORT
 int @(msg_prefix)_CDECL @(msg_typename)__getsize_array_field_@(member.name)_message(void *);
+@[        if isinstance(member.type, AbstractSequence)]@
+@(msg_prefix)_EXPORT
+void @(msg_prefix)_CDECL @(msg_typename)__setsize_array_field_@(member.name)_message(void *, int);
+@[        end if]
 
 @[        if isinstance(member.type.value_type, BasicType)]@
 @(msg_prefix)_EXPORT

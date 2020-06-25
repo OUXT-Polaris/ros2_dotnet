@@ -67,6 +67,13 @@ int @(msg_typename)__getsize_array_field_@(member.name)_message(void *message_ha
   return ros_message->@(member.name).size;
 @[        end if]@
 }
+@[        if isinstance(member.type, AbstractSequence)]@
+void @(msg_typename)__setsize_array_field_@(member.name)_message(void * message_handle, int size)
+{
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  ros_message->@(member.name).size = size;
+}
+@[        end if]
 
 @[        if isinstance(member.type.value_type, BasicType)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
