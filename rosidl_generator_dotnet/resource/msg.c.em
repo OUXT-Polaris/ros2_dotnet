@@ -71,7 +71,12 @@ int @(msg_typename)__getsize_array_field_@(member.name)_message(void *message_ha
 void @(msg_typename)__setsize_array_field_@(member.name)_message(void * message_handle, int size)
 {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
-  ros_message->@(member.name).size = size;
+@[        if isinstance(member.type.value_type, BasicType)]@
+  if (!rosidl_generator_c__@(member.type.value_type.typename)__Sequence__init(&ros_message->@(member.name), size))
+    return;
+@[        end if]@
+  if (!@(msg_typename)__Sequence__init(&ros_message->@(member.name), size))
+    return;
 }
 @[        end if]
 
