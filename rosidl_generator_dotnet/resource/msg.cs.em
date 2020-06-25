@@ -41,7 +41,7 @@ public class @(type_name) : IMessage {
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(@(member.type.size));
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+        @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType)]@
@@ -74,7 +74,7 @@ public class @(type_name) : IMessage {
             native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
         IntPtr native_get_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__get_field_@(member.name)_message");
         IntPtr native_getsize_array_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__getsize_array_field_@(member.name)_message");
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
@@ -94,8 +94,6 @@ public class @(type_name) : IMessage {
             native_read_field_@(member.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))Type));
 @[        end if]@
 
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -137,7 +135,7 @@ public class @(type_name) : IMessage {
     private static NativeDestroyNativeMessageType native_destroy_native_message = null;
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
     private static NativeGetField@(get_field_name(type_name, member.name))MessageType native_get_field_@(member.name)_message = null;
     private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType native_getsize_array_field_@(member.name)_message = null;
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
@@ -163,8 +161,6 @@ public class @(type_name) : IMessage {
     private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, @(get_dotnet_type(member.type.value_type)) value);
 @[            end if]@
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -205,7 +201,7 @@ public class @(type_name) : IMessage {
 
     public void _READ_HANDLE(IntPtr messageHandle) {
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
 
       {
           int size = native_getsize_array_field_@(member.name)_message(messageHandle);
@@ -225,10 +221,6 @@ public class @(type_name) : IMessage {
         }
       }
 
-
-
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -246,7 +238,7 @@ public class @(type_name) : IMessage {
 
     public void _WRITE_HANDLE(IntPtr messageHandle) {
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
         {
             int count = 0;
             foreach(@(get_dotnet_type(member.type.value_type)) value in @(get_field_name(type_name, member.name)))
@@ -263,8 +255,6 @@ public class @(type_name) : IMessage {
             }
         }
 
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -285,10 +275,8 @@ public class @(type_name) : IMessage {
 @[end for]@
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
+@[    if isinstance(member.type, (AbstractSequence,Array))]@
     public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    else]@
